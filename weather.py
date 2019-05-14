@@ -2,58 +2,99 @@ from bs4 import BeautifulSoup
 import time
 import arcade
 import urllib.request
+import sys
 
 #windows constants
-SCREEN_WIDTH = 300
-SCREEN_HEIGHT = 300
+SCREEN_WIDTH = 400
+SCREEN_HEIGHT = 400
 
 #create window
 class window(arcade.Window):
     def __init__(self,SCREEN_WIDTH,SCREEN_HEIGHT, title = "Today's Weather"):
         super().__init__(SCREEN_WIDTH,SCREEN_HEIGHT, title = "Today's Weather")
-        arcade.set_background_color(arcade.color.WHITE)
-        
-        
+        arcade.set_background_color(arcade.color.BLACK)
+               
     def on_draw(self):
         arcade.start_render()
         
         temp = getTemp()
         cond = getCond()
         
-        values = [temp, cond]
-        
-        arcade.draw_text(temp,150,150,color = arcade.color.BLACK)
-        arcade.draw_text(cond,200,200,color = arcade.color.BLACK)
-        if values[0]
-        
-        arcade.finish_render()
+        arcade.draw_text("Today's Temperature: ",200,350,color = arcade.color.RED)
+        arcade.draw_text(temp + ' F',200,300,color = arcade.color.RED)
+        arcade.draw_text(cond,200,250,color = arcade.color.RED)
 
-        return values
+        #determine picture based on cond
+        if cond == 'Partly Cloudy' or 'Mostly Cloudy':
+            image = arcade.Sprite("partly_cloudy.png")
+            image.center_x = 200
+            image.center_y = 150
+            image.draw()
+        elif cond == 'Cloudy':
+            image = arcade.Sprite("cloudy.png")
+            image.center_x = 200
+            image.center_y = 150
+            image.draw()
+        elif cond == 'Sunny' or 'Clear':
+            image = arcade.Sprite("happy_sun.png")
+            image.center_x = 200
+            image.center_y = 150
+            image.draw()
+        elif cond == 'Showers' or 'Rain':
+            image = arcade.Sprite("rain.png")
+            image.center_x = 200
+            image.center_y = 150
+            image.draw()
+        else:
+            image = arcade.Sprite("neutral_sun.png")
+            image.center_x = 200
+            image.center_y = 150
+            image.draw()
+        #finish render
+        arcade.finish_render()
+        time.sleep(5)
+        arcade.close_window()
         
 #find temperature from www.wunderground.com
-def getTemp():    
-    webpage = "https://www.wunderground.com/weather/us/oh/cincinnati/45201"
-    websource = urllib.request.urlopen(webpage)
-    #allow for page to update
-    time.sleep(3)
-    
-    soup = BeautifulSoup(websource, "html.parser")
-    #look for current temp
-    soup = soup.find_all('span', {'class', 'wu-value wu-value-to'},{'style', '"color:#93c124;"'})
-    s = str(soup[1])
+def getTemp():
+    i = 0
+    while i == 0:
+        webpage = "https://www.wunderground.com/weather/us/oh/cincinnati/45201"
+        websource = urllib.request.urlopen(webpage)
+        #allow for page to update
+        time.sleep(3)
+        
+        soup = BeautifulSoup(websource, "html.parser")
+        #look for current temp
+        soup = soup.find_all('span', {'class', 'wu-value wu-value-to'},{'style', '"color:#93c124;"'})
+        try:
+             s = str(soup[1])
+        except IndexError:
+            i = 0
+        else:
+            i = 1
+            
     return s[62:64]
+
 #Get the sky conditions
 def getCond():
-    webpage = "https://www.wunderground.com/weather/us/oh/cincinnati/45201"
-    websource = urllib.request.urlopen(webpage)
-    #allow for page to update
-    time.sleep(3)
-        
-    soup = BeautifulSoup(websource, "html.parser")
-    #look for current condition
-    soup = soup.find_all({'p', '_nncontent-c30'})
-    newString = str(soup[4])
-
+    i = 0
+    while i == 0:
+        webpage = "https://www.wunderground.com/weather/us/oh/cincinnati/45201"
+        websource = urllib.request.urlopen(webpage)
+        #allow for page to update
+        time.sleep(3)
+            
+        soup = BeautifulSoup(websource, "html.parser")
+        #look for current condition
+        soup = soup.find_all({'p', '_nncontent-c30'})
+        #make sure data is found
+        try:
+             newString = str(soup[4])
+        except IndexError:
+            i = 0
+        else:
+            i = 1        
     i = 0
     x = 0
     cond = ''
@@ -67,12 +108,14 @@ def getCond():
     return cond
 
 def main():
-    weather = window(SCREEN_WIDTH, SCREEN_HEIGHT)
-    values = window.on_draw(weather)
-    arcade.run()
+        weather = window(SCREEN_WIDTH, SCREEN_HEIGHT)
+        weather.on_draw()
+        arcade.run()   
     
 if __name__ == "__main__":
     main()
+
+    
 
    
 
