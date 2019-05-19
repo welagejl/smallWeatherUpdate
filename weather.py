@@ -25,7 +25,7 @@ class window(arcade.Window):
         arcade.draw_text(cond,200,250,color = arcade.color.RED)
 
         #determine picture based on cond
-        if cond == 'Partly Cloudy' or 'Mostly Cloudy':
+        if cond == 'Partly Cloudy' or  cond == 'Mostly Cloudy':
             image = arcade.Sprite("partly_cloudy.png")
             image.center_x = 200
             image.center_y = 150
@@ -35,12 +35,12 @@ class window(arcade.Window):
             image.center_x = 200
             image.center_y = 150
             image.draw()
-        elif cond == 'Sunny' or 'Clear':
+        elif cond == 'Sunny' or cond == 'Clear':
             image = arcade.Sprite("happy_sun.png")
             image.center_x = 200
             image.center_y = 150
             image.draw()
-        elif cond == 'Showers' or 'Rain':
+        elif cond == 'Showers' or cond == 'Rain':
             image = arcade.Sprite("rain.png")
             image.center_x = 200
             image.center_y = 150
@@ -68,13 +68,23 @@ def getTemp():
         #look for current temp
         soup = soup.find_all('span', {'class', 'wu-value wu-value-to'},{'style', '"color:#93c124;"'})
         try:
-             s = str(soup[1])
+             temp = str(soup[1])
         except IndexError:
             i = 0
         else:
             i = 1
+        i = 0
+        x = 0
+        getTemp = ''
+        while temp[i] != '>':
+            x = i
+            i +=1
+        x = x + 2
+        while temp[x] !=  '<':
+            getTemp = getTemp + temp[x]
+            x += 1
             
-    return s[62:64]
+    return getTemp
 
 #Get the sky conditions
 def getCond():
